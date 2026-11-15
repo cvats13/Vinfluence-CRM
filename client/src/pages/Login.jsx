@@ -1,6 +1,5 @@
-import "./Login.css";
 
-import illustration from "../assets/illustration.png";
+import "./Login.css";
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -38,6 +37,29 @@ function Login() {
     }
   };
 
+  const features = [
+    {
+      icon: <FaUsers />,
+      title: "Client",
+      subtitle: "Management",
+    },
+    {
+      icon: <FaMoneyBillWave />,
+      title: "Payment",
+      subtitle: "Tracking",
+    },
+    {
+      icon: <FaTasks />,
+      title: "Task",
+      subtitle: "Management",
+    },
+    {
+      icon: <FaChartLine />,
+      title: "Growth",
+      subtitle: "Analytics",
+    },
+  ];
+
   return (
     <div className="login-page">
 
@@ -47,68 +69,60 @@ function Login() {
 
         <motion.div
           className="left-side"
-          initial={{ x: -80, opacity: 0 }}
+          initial={{ x: -50, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
-          transition={{ duration: 1 }}
+          transition={{ duration: 0.8 }}
         >
 
-          
+          <div className="brand-content">
 
-          <h4>Welcome to</h4>
+            <h4>WELCOME TO</h4>
 
-          <h1>
-            Vinfluence <span>CRM</span>
-          </h1>
+            <h1>
+              Vinfluence
+              <span> CRM</span>
+            </h1>
 
-          <p>
-            Manage your clients, projects,
-            payments and your team from one
-            beautiful dashboard.
-          </p>
-          <img
-  src={illustration}
-  alt="CRM Illustration"
-  className="hero-image"
-/>
+            <p>
+              Manage your clients, projects, payments
+              and your team from one beautiful dashboard.
+            </p>
+
+          </div>
+
+          {/* FEATURE CARDS */}
 
           <div className="feature-box">
 
-            <div className="feature">
-              <FaUsers size={28} />
+            {features.map((feature, index) => (
+              <motion.div
+                className="feature"
+                key={feature.title}
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{
+                  duration: 0.5,
+                  delay: 0.3 + index * 0.12,
+                }}
+              >
 
-              <div>
-                <h5>Client</h5>
-                <small>Management</small>
-              </div>
-            </div>
+                <div className="feature-icon">
+                  {feature.icon}
+                </div>
 
-            <div className="feature">
-              <FaMoneyBillWave size={28} />
+                <div>
+                  <h5>{feature.title}</h5>
+                  <small>{feature.subtitle}</small>
+                </div>
 
-              <div>
-                <h5>Payment</h5>
-                <small>Tracking</small>
-              </div>
-            </div>
+              </motion.div>
+            ))}
 
-            <div className="feature">
-              <FaTasks size={28} />
+          </div>
 
-              <div>
-                <h5>Task</h5>
-                <small>Management</small>
-              </div>
-            </div>
-
-            <div className="feature">
-              <FaChartLine size={28} />
-
-              <div>
-                <h5>Growth</h5>
-                <small>Analytics</small>
-              </div>
-            </div>
-
+          <div className="brand-footer">
+            <span>VINFLUENCE CRM</span>
+            <span>Grow Faster. Manage Smarter.</span>
           </div>
 
         </motion.div>
@@ -117,14 +131,15 @@ function Login() {
 
         <motion.div
           className="login-card"
-          initial={{ x: 80, opacity: 0 }}
+          initial={{ x: 50, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
-          transition={{ duration: 1 }}
+          transition={{ duration: 0.8 }}
         >
 
-          <h2>Welcome Back 👋</h2>
-
-          <p>Please login to continue</p>
+          <div className="login-heading">
+            <h2>Welcome Back 👋</h2>
+            <p>Please login to continue</p>
+          </div>
 
           <form onSubmit={handleLogin}>
 
@@ -156,15 +171,20 @@ function Login() {
 
               <span
                 className="eye"
+                role="button"
+                tabIndex={0}
+                aria-label="Toggle password visibility"
                 onClick={() =>
                   setShowPassword(!showPassword)
                 }
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setShowPassword(!showPassword);
+                  }
+                }}
               >
-                {showPassword ? (
-                  <FaEyeSlash />
-                ) : (
-                  <FaEye />
-                )}
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
               </span>
 
             </div>
@@ -191,6 +211,10 @@ function Login() {
             </button>
 
           </form>
+
+          <div className="login-footer">
+            Secure Access • Vinfluence Media
+          </div>
 
         </motion.div>
 
