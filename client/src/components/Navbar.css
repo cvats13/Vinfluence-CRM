@@ -1,0 +1,76 @@
+
+.crm-navbar {
+  width: 100%;
+  min-height: 72px;
+  padding: 12px 24px;
+  background: #2563eb;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  position: relative;
+  z-index: 1000;
+}
+
+.crm-navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.crm-navbar h2,
+.crm-navbar h3 {
+  margin: 0;
+  color: #fff;
+  font-size: 24px;
+}
+
+.crm-menu-toggle {
+  display: none;
+  width: 40px;
+  height: 40px;
+  padding: 9px;
+  border: 1px solid rgba(255,255,255,.5);
+  border-radius: 7px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.crm-menu-toggle span {
+  display: block;
+  height: 2px;
+  width: 100%;
+  margin: 4px 0;
+  background: #fff;
+}
+
+@media (max-width: 768px) {
+  .crm-navbar {
+    min-height: 60px;
+    padding: 10px 14px;
+  }
+
+  .crm-navbar h2 {
+    font-size: 19px;
+  }
+
+  .crm-navbar h3 {
+    font-size: 13px;
+  }
+
+  .crm-menu-toggle {
+    display: block;
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 380px) {
+  .crm-navbar h2 {
+    font-size: 16px;
+  }
+
+  .crm-navbar h3 {
+    font-size: 11px;
+  }
+}
