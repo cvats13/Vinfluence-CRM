@@ -1,5 +1,5 @@
 
-import "./Nacbar.css";
+import "./Navbar.css";
 
 function Navbar() {
   const toggleSidebar = () => {
