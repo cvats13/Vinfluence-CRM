@@ -644,3 +644,146 @@ body {
         transition-duration: .01ms !important;
     }
 }
+
+
+/* =================================
+   LOGIN PAGE ALIGNMENT FIX
+================================= */
+
+/* Left section alignment */
+
+.left-side {
+    align-items: center;
+    text-align: center;
+    width: 100%;
+}
+
+.brand-content {
+    width: 100%;
+    max-width: 650px;
+    text-align: center;
+}
+
+.brand-content h4 {
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+}
+
+.brand-content h1 {
+    margin: 0;
+    line-height: 1.15;
+    white-space: nowrap;
+}
+
+.brand-content p {
+    max-width: 600px;
+    margin: 18px auto 25px;
+    text-align: center;
+}
+
+/* Feature cards */
+
+.feature-box {
+    width: 100%;
+    max-width: 490px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    justify-content: center;
+}
+
+.feature {
+    width: 100%;
+    min-height: 76px;
+    padding: 15px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: left;
+}
+
+/* Feature icons */
+
+.feature-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    color: #55D8FF;
+    font-size: 25px;
+}
+
+/* Brand footer */
+
+.brand-footer {
+    width: 100%;
+    margin-top: 22px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    text-align: center;
+}
+
+.brand-footer span:first-child {
+    color: #55D8FF;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.brand-footer span:last-child {
+    color: #B8DFFF;
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: .5px;
+}
+
+/* Login footer */
+
+.login-footer {
+    margin-top: 22px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255,255,255,.12);
+    text-align: center;
+    color: #B8DFFF;
+    font-size: 12px;
+    letter-spacing: .4px;
+}
+
+/* Tablet */
+
+@media (max-width: 992px) {
+    .brand-content h1 {
+        white-space: normal;
+    }
+
+    .feature-box {
+        max-width: 490px;
+    }
+}
+
+/* Mobile */
+
+@media (max-width: 600px) {
+    .brand-content h1 {
+        font-size: 34px;
+        white-space: normal;
+    }
+
+    .feature-box {
+        max-width: 100%;
+        gap: 10px;
+    }
+
+    .feature {
+        padding: 12px 9px;
+    }
+
+    .brand-footer {
+        margin-top: 18px;
+    }
+}
+
