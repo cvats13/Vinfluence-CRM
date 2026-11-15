@@ -1,4 +1,6 @@
+
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import DashboardChart from "../components/DashboardChart";
@@ -6,6 +8,9 @@ import API from "../services/api";
 
 function Dashboard() {
   const [clients, setClients] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchClients();
@@ -13,11 +18,14 @@ function Dashboard() {
 
   const fetchClients = async () => {
     try {
+      setLoading(true);
       const response = await API.get("/clients");
       setClients(response.data);
     } catch (error) {
-      console.log(error);
+      console.error("Dashboard error:", error);
       alert("Failed to load dashboard data");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -32,121 +40,258 @@ function Dashboard() {
   ).length;
 
   const totalServices = new Set(
-    clients.map((client) => client.service)
+    clients
+      .map((client) => client.service)
+      .filter(Boolean)
   ).size;
+
+  const stats = [
+    {
+      title: "Total Clients",
+      value: totalClients,
+      color: "#2563eb",
+      background: "#eff6ff",
+      icon: "TC",
+    },
+    {
+      title: "Active Clients",
+      value: activeClients,
+      color: "#16a34a",
+      background: "#f0fdf4",
+      icon: "AC",
+    },
+    {
+      title: "Inactive Clients",
+      value: inactiveClients,
+      color: "#dc2626",
+      background: "#fef2f2",
+      icon: "IC",
+    },
+    {
+      title: "Total Services",
+      value: totalServices,
+      color: "#d97706",
+      background: "#fffbeb",
+      icon: "TS",
+    },
+  ];
+
+  const recentClients = clients.slice(0, 5);
 
   return (
     <>
       <Navbar />
 
-      <div className="d-flex">
+      <div className="d-flex crm-dashboard-layout">
         <Sidebar />
 
-        <div className="container-fluid p-4">
+        <main className="container-fluid p-3 p-md-4">
 
-          <h2 className="text-center text-primary mb-4">
-            📊 Dashboard
-          </h2>
-
-          <div className="row">
-
-            <div className="col-md-3 mb-3">
-              <div className="card shadow">
-                <div className="card-body text-center">
-                  <h5>Total Clients</h5>
-                  <h2 className="text-primary">{totalClients}</h2>
-                </div>
-              </div>
+          {/* Dashboard Header */}
+          <div className="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+            <div>
+              <h2 className="fw-bold text-primary mb-1">
+                Dashboard
+              </h2>
+              <p className="text-muted mb-0">
+                Welcome back! Here's your business overview.
+              </p>
             </div>
 
-            <div className="col-md-3 mb-3">
-              <div className="card shadow">
-                <div className="card-body text-center">
-                  <h5>Active Clients</h5>
-                  <h2 className="text-success">{activeClients}</h2>
-                </div>
-              </div>
-            </div>
-
-            <div className="col-md-3 mb-3">
-              <div className="card shadow">
-                <div className="card-body text-center">
-                  <h5>Inactive Clients</h5>
-                  <h2 className="text-danger">{inactiveClients}</h2>
-                </div>
-              </div>
-            </div>
-
-            <div className="col-md-3 mb-3">
-              <div className="card shadow">
-                <div className="card-body text-center">
-                  <h5>Total Services</h5>
-                  <h2 className="text-warning">{totalServices}</h2>
-                </div>
-              </div>
-            </div>
-
+            <button
+              className="btn btn-primary"
+              onClick={() => navigate("/add-client")}
+            >
+              + Add New Client
+            </button>
           </div>
 
-          {/* Charts */}
-          <DashboardChart
-            total={totalClients}
-            active={activeClients}
-            inactive={inactiveClients}
-          />
+          {loading ? (
+            <div className="card border-0 shadow-sm">
+              <div className="card-body text-center py-5">
+                Loading dashboard...
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Statistics Cards */}
+              <div className="row g-3 mb-4">
+                {stats.map((stat) => (
+                  <div
+                    className="col-6 col-md-6 col-xl-3"
+                    key={stat.title}
+                  >
+                    <div
+                      className="card h-100 border-0 shadow-sm"
+                      style={{
+                        borderRadius: "14px",
+                        borderLeft: `4px solid ${stat.color}`,
+                      }}
+                    >
+                      <div className="card-body p-3 p-md-4">
+                        <div className="d-flex justify-content-between align-items-center mb-3">
+                          <span
+                            className="rounded-3 d-flex align-items-center justify-content-center fw-bold"
+                            style={{
+                              width: "38px",
+                              height: "38px",
+                              background: stat.background,
+                              color: stat.color,
+                              fontSize: "12px",
+                            }}
+                          >
+                            {stat.icon}
+                          </span>
+                        </div>
 
-          {/* Recent Clients */}
-          <div className="card shadow mt-5">
+                        <p className="text-muted mb-1 small">
+                          {stat.title}
+                        </p>
 
-            <div className="card-body">
-
-              <h4 className="mb-4">
-                Recent Clients
-              </h4>
-
-              <table className="table table-bordered table-hover">
-
-                <thead className="table-dark">
-
-                  <tr>
-                    <th>Company</th>
-                    <th>Owner</th>
-                    <th>Service</th>
-                    <th>Status</th>
-                  </tr>
-
-                </thead>
-
-                <tbody>
-
-                  {clients.slice(0, 5).map((client) => (
-                    <tr key={client._id}>
-                      <td>{client.companyName}</td>
-                      <td>{client.ownerName}</td>
-                      <td>{client.service}</td>
-                      <td>
-                        <span
-                          className={`badge ${
-                            client.status === "Active"
-                              ? "bg-success"
-                              : "bg-danger"
-                          }`}
+                        <h2
+                          className="fw-bold mb-0"
+                          style={{ color: stat.color }}
                         >
-                          {client.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
+                          {stat.value}
+                        </h2>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
 
-                </tbody>
+              {/* Dashboard Chart */}
+              <div className="mb-4">
+                <DashboardChart
+                  total={totalClients}
+                  active={activeClients}
+                  inactive={inactiveClients}
+                />
+              </div>
 
-              </table>
+              {/* Recent Clients */}
+              <div className="card border-0 shadow-sm mb-4">
+                <div className="card-body p-3 p-md-4">
 
-            </div>
+                  <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+                    <div>
+                      <h4 className="fw-bold mb-1">
+                        Recent Clients
+                      </h4>
+                      <p className="text-muted small mb-0">
+                        Your latest client records
+                      </p>
+                    </div>
 
-          </div>
+                    <button
+                      className="btn btn-outline-primary btn-sm"
+                      onClick={() => navigate("/clients")}
+                    >
+                      View All Clients
+                    </button>
+                  </div>
 
-        </div>
+                  {recentClients.length === 0 ? (
+                    <div className="text-center py-4">
+                      <p className="text-muted mb-3">
+                        No clients added yet.
+                      </p>
+
+                      <button
+                        className="btn btn-primary btn-sm"
+                        onClick={() => navigate("/add-client")}
+                      >
+                        Add Your First Client
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Desktop Table */}
+                      <div className="table-responsive d-none d-md-block">
+                        <table className="table table-hover align-middle mb-0">
+                          <thead className="table-light">
+                            <tr>
+                              <th>Company</th>
+                              <th>Owner</th>
+                              <th>Service</th>
+                              <th>Status</th>
+                            </tr>
+                          </thead>
+
+                          <tbody>
+                            {recentClients.map((client) => (
+                              <tr key={client._id}>
+                                <td className="fw-semibold">
+                                  {client.companyName}
+                                </td>
+
+                                <td>{client.ownerName}</td>
+
+                                <td>{client.service || "-"}</td>
+
+                                <td>
+                                  <span
+                                    className={`badge ${
+                                      client.status === "Active"
+                                        ? "bg-success"
+                                        : "bg-danger"
+                                    }`}
+                                  >
+                                    {client.status || "Inactive"}
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+
+                      {/* Mobile Client Cards */}
+                      <div className="d-md-none">
+                        <div className="d-flex flex-column gap-3">
+                          {recentClients.map((client) => (
+                            <div
+                              key={client._id}
+                              className="p-3 rounded-3 border"
+                            >
+                              <div className="d-flex justify-content-between align-items-start gap-2">
+                                <div>
+                                  <h6 className="fw-bold mb-1">
+                                    {client.companyName}
+                                  </h6>
+
+                                  <p className="text-muted small mb-2">
+                                    {client.ownerName}
+                                  </p>
+                                </div>
+
+                                <span
+                                  className={`badge ${
+                                    client.status === "Active"
+                                      ? "bg-success"
+                                      : "bg-danger"
+                                  }`}
+                                >
+                                  {client.status || "Inactive"}
+                                </span>
+                              </div>
+
+                              <div className="text-muted small">
+                                Service: {client.service || "-"}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                </div>
+              </div>
+            </>
+          )}
+
+        </main>
       </div>
     </>
   );
