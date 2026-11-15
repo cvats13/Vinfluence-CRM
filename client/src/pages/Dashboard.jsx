@@ -29,6 +29,7 @@ function Dashboard() {
     }
   };
 
+  // Client Statistics
   const totalClients = clients.length;
 
   const activeClients = clients.filter(
@@ -40,11 +41,36 @@ function Dashboard() {
   ).length;
 
   const totalServices = new Set(
-    clients
-      .map((client) => client.service)
-      .filter(Boolean)
+    clients.map((client) => client.service).filter(Boolean)
   ).size;
 
+  // Financial Calculations
+  const totalRevenue = clients.reduce(
+    (total, client) => total + Number(client.totalAmount || 0),
+    0
+  );
+
+  const amountReceived = clients.reduce(
+    (total, client) => total + Number(client.paidAmount || 0),
+    0
+  );
+
+  const outstandingAmount = clients.reduce(
+    (total, client) => total + Number(client.dueAmount || 0),
+    0
+  );
+
+  const collectionRate =
+    totalRevenue > 0
+      ? Math.min((amountReceived / totalRevenue) * 100, 100)
+      : 0;
+
+  const formatCurrency = (amount) =>
+    `₹${Number(amount || 0).toLocaleString("en-IN", {
+      maximumFractionDigits: 2,
+    })}`;
+
+  // Client Statistics Cards
   const stats = [
     {
       title: "Total Clients",
@@ -73,6 +99,42 @@ function Dashboard() {
       color: "#d97706",
       background: "#fffbeb",
       icon: "TS",
+    },
+  ];
+
+  // Financial Cards
+  const financialStats = [
+    {
+      title: "Total Revenue",
+      value: formatCurrency(totalRevenue),
+      description: "Total client contract value",
+      color: "#2563eb",
+      background: "#eff6ff",
+      icon: "TR",
+    },
+    {
+      title: "Amount Received",
+      value: formatCurrency(amountReceived),
+      description: "Total payments collected",
+      color: "#16a34a",
+      background: "#f0fdf4",
+      icon: "AR",
+    },
+    {
+      title: "Outstanding Payments",
+      value: formatCurrency(outstandingAmount),
+      description: "Amount pending from clients",
+      color: "#dc2626",
+      background: "#fef2f2",
+      icon: "OP",
+    },
+    {
+      title: "Collection Rate",
+      value: `${collectionRate.toFixed(1)}%`,
+      description: "Revenue collection progress",
+      color: "#d97706",
+      background: "#fffbeb",
+      icon: "CR",
     },
   ];
 
@@ -114,7 +176,11 @@ function Dashboard() {
             </div>
           ) : (
             <>
-              {/* Statistics Cards */}
+              {/* Client Statistics */}
+              <h5 className="fw-bold mb-3">
+                Client Overview
+              </h5>
+
               <div className="row g-3 mb-4">
                 {stats.map((stat) => (
                   <div
@@ -129,7 +195,7 @@ function Dashboard() {
                       }}
                     >
                       <div className="card-body p-3 p-md-4">
-                        <div className="d-flex justify-content-between align-items-center mb-3">
+                        <div className="d-flex align-items-center mb-3">
                           <span
                             className="rounded-3 d-flex align-items-center justify-content-center fw-bold"
                             style={{
@@ -154,6 +220,88 @@ function Dashboard() {
                         >
                           {stat.value}
                         </h2>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Financial Overview */}
+              <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3 mt-4">
+                <div>
+                  <h5 className="fw-bold mb-1">
+                    Financial Overview
+                  </h5>
+                  <p className="text-muted small mb-0">
+                    Revenue and payment performance
+                  </p>
+                </div>
+              </div>
+
+              <div className="row g-3 mb-4">
+                {financialStats.map((stat) => (
+                  <div
+                    className="col-6 col-xl-3"
+                    key={stat.title}
+                  >
+                    <div
+                      className="card h-100 border-0 shadow-sm"
+                      style={{
+                        borderRadius: "14px",
+                        borderLeft: `4px solid ${stat.color}`,
+                      }}
+                    >
+                      <div className="card-body p-3 p-md-4">
+                        <span
+                          className="rounded-3 d-flex align-items-center justify-content-center fw-bold mb-3"
+                          style={{
+                            width: "38px",
+                            height: "38px",
+                            background: stat.background,
+                            color: stat.color,
+                            fontSize: "12px",
+                          }}
+                        >
+                          {stat.icon}
+                        </span>
+
+                        <p className="text-muted small mb-1">
+                          {stat.title}
+                        </p>
+
+                        <h4
+                          className="fw-bold mb-2"
+                          style={{
+                            color: stat.color,
+                            fontSize: "clamp(16px, 2vw, 24px)",
+                            overflowWrap: "anywhere",
+                          }}
+                        >
+                          {stat.value}
+                        </h4>
+
+                        <small className="text-muted">
+                          {stat.description}
+                        </small>
+
+                        {stat.title === "Collection Rate" && (
+                          <div
+                            className="progress mt-3"
+                            style={{ height: "7px" }}
+                          >
+                            <div
+                              className="progress-bar"
+                              role="progressbar"
+                              style={{
+                                width: `${collectionRate}%`,
+                                backgroundColor: stat.color,
+                              }}
+                              aria-valuenow={collectionRate}
+                              aria-valuemin="0"
+                              aria-valuemax="100"
+                            />
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -224,11 +372,8 @@ function Dashboard() {
                                 <td className="fw-semibold">
                                   {client.companyName}
                                 </td>
-
                                 <td>{client.ownerName}</td>
-
                                 <td>{client.service || "-"}</td>
-
                                 <td>
                                   <span
                                     className={`badge ${
@@ -259,7 +404,6 @@ function Dashboard() {
                                   <h6 className="fw-bold mb-1">
                                     {client.companyName}
                                   </h6>
-
                                   <p className="text-muted small mb-2">
                                     {client.ownerName}
                                   </p>
@@ -285,7 +429,6 @@ function Dashboard() {
                       </div>
                     </>
                   )}
-
                 </div>
               </div>
             </>
