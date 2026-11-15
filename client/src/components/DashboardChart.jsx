@@ -1,3 +1,4 @@
+
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -10,6 +11,7 @@ import {
 } from "chart.js";
 
 import { Bar, Pie } from "react-chartjs-2";
+import "./DashboardChart.css";
 
 ChartJS.register(
   CategoryScale,
@@ -28,17 +30,20 @@ function DashboardChart({ total, active, inactive }) {
       {
         label: "Total Clients",
         data: [total],
-        backgroundColor: "rgba(13,110,253,0.8)",
+        backgroundColor: "#3B82F6",
+        borderRadius: 6,
       },
       {
         label: "Active Clients",
         data: [active],
-        backgroundColor: "rgba(25,135,84,0.8)",
+        backgroundColor: "#10B981",
+        borderRadius: 6,
       },
       {
         label: "Inactive Clients",
         data: [inactive],
-        backgroundColor: "rgba(220,53,69,0.8)",
+        backgroundColor: "#EF4444",
+        borderRadius: 6,
       },
     ],
   };
@@ -48,50 +53,80 @@ function DashboardChart({ total, active, inactive }) {
     datasets: [
       {
         data: [active, inactive],
-        backgroundColor: [
-          "rgba(25,135,84,0.8)",
-          "rgba(220,53,69,0.8)",
-        ],
-        borderWidth: 1,
+        backgroundColor: ["#10B981", "#EF4444"],
+        borderColor: "#ffffff",
+        borderWidth: 2,
       },
     ],
   };
 
-  const options = {
+  const barOptions = {
     responsive: true,
-    maintainAspectRatio: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: "top",
+        position: "bottom",
+        labels: {
+          usePointStyle: true,
+          padding: 15,
+          boxWidth: 8,
+          font: {
+            size: 11,
+          },
+        },
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          precision: 0,
+        },
+      },
+    },
+  };
+
+  const pieOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: "bottom",
+        labels: {
+          usePointStyle: true,
+          padding: 15,
+          boxWidth: 8,
+          font: {
+            size: 12,
+          },
+        },
       },
     },
   };
 
   return (
-    <div className="row mt-5">
-      <div className="col-md-6 mb-4">
-        <div className="card shadow">
-          <div className="card-body">
-            <h4 className="text-center mb-3">
-              Client Overview
-            </h4>
+    <div className="dashboard-charts">
 
-            <Bar data={barData} options={options} />
-          </div>
+      <div className="chart-card">
+
+        <h4>Client Overview</h4>
+
+        <div className="chart-container">
+          <Bar data={barData} options={barOptions} />
         </div>
+
       </div>
 
-      <div className="col-md-6 mb-4">
-        <div className="card shadow">
-          <div className="card-body">
-            <h4 className="text-center mb-3">
-              Active vs Inactive
-            </h4>
+      <div className="chart-card">
 
-            <Pie data={pieData} options={options} />
-          </div>
+        <h4>Active vs Inactive</h4>
+
+        <div className="chart-container pie-container">
+          <Pie data={pieData} options={pieOptions} />
         </div>
+
       </div>
+
     </div>
   );
 }
