@@ -3,20 +3,22 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import API from "../services/api";
 
+// Generate the correct URL for Cloudinary and older uploads
 function getMediaUrl(filePath) {
   if (!filePath) return "#";
 
-  // Cloudinary URLs are already complete.
+  const backendUrl = API.defaults.baseURL.replace(/\/api\/?$/, "");
+
+  // Cloudinary URLs should open directly
   if (/^https?:\/\//i.test(filePath)) {
     try {
       const url = new URL(filePath);
 
-      // Convert old localhost URLs to the deployed backend.
+      // Replace old localhost URLs with the Render backend
       if (
         url.hostname === "localhost" ||
         url.hostname === "127.0.0.1"
       ) {
-        const backendUrl = API.defaults.baseURL.replace(/\/api\/?$/, "");
         return `${backendUrl}${url.pathname}${url.search}`;
       }
 
@@ -26,9 +28,10 @@ function getMediaUrl(filePath) {
     }
   }
 
-  // Support old relative uploads paths.
-  const backendUrl = API.defaults.baseURL.replace(/\/api\/?$/, "");
-  const cleanPath = filePath.replace(/\\/g, "/").replace(/^\/+/, "");
+  // Support older files stored in the backend uploads folder
+  const cleanPath = filePath
+    .replace(/\\/g, "/")
+    .replace(/^\/+/, "");
 
   return `${backendUrl}/${cleanPath}`;
 }
@@ -41,6 +44,7 @@ function ClientMaterials() {
   const [file, setFile] = useState(null);
   const [materials, setMaterials] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(true);
 
   useEffect(() => {
     fetchMaterials();
@@ -48,11 +52,16 @@ function ClientMaterials() {
 
   const fetchMaterials = async () => {
     try {
+      setFetching(true);
+
       const response = await API.get(`/materials/${id}`);
+
       setMaterials(response.data);
     } catch (error) {
       console.error("Failed to load materials:", error);
       alert("Failed to load materials.");
+    } finally {
+      setFetching(false);
     }
   };
 
@@ -65,6 +74,7 @@ function ClientMaterials() {
     }
 
     const formData = new FormData();
+
     formData.append("clientId", id);
     formData.append("title", title);
     formData.append("category", category);
@@ -80,11 +90,13 @@ function ClientMaterials() {
       setTitle("");
       setCategory("Logo");
       setFile(null);
+
       e.target.reset();
 
       await fetchMaterials();
     } catch (error) {
       console.error("Upload failed:", error);
+
       alert(
         error.response?.data?.message ||
           "Upload failed. Please try again."
@@ -96,14 +108,24 @@ function ClientMaterials() {
 
   return (
     <div className="container-fluid mt-4 px-3 px-md-4">
+
+      {/* Upload Material */}
       <div className="card shadow-sm mb-4">
         <div className="card-body p-3 p-md-4">
-          <h3 className="mb-4">Client Materials</h3>
+
+          <h3 className="mb-4">
+            Client Materials
+          </h3>
 
           <form onSubmit={handleSubmit}>
+
             <div className="row g-3">
+
               <div className="col-12 col-md-4">
-                <label className="form-label">Material Title</label>
+                <label className="form-label">
+                  Material Title
+                </label>
+
                 <input
                   type="text"
                   className="form-control"
@@ -115,7 +137,10 @@ function ClientMaterials() {
               </div>
 
               <div className="col-12 col-md-3">
-                <label className="form-label">Category</label>
+                <label className="form-label">
+                  Category
+                </label>
+
                 <select
                   className="form-select"
                   value={category}
@@ -131,7 +156,10 @@ function ClientMaterials() {
               </div>
 
               <div className="col-12 col-md-3">
-                <label className="form-label">Choose File</label>
+                <label className="form-label">
+                  Choose File
+                </label>
+
                 <input
                   type="file"
                   className="form-control"
@@ -151,43 +179,67 @@ function ClientMaterials() {
                   {loading ? "Uploading..." : "Upload"}
                 </button>
               </div>
+
             </div>
           </form>
+
         </div>
       </div>
 
+      {/* Uploaded Materials */}
       <div className="row g-3">
-        {materials.length > 0 ? (
-          materials.map((item) => (
-            <div
-              className="col-12 col-sm-6 col-lg-4"
-              key={item._id}
-            >
-              <div className="card shadow-sm h-100">
-                <div className="card-body">
-                  <h5 className="card-title">{item.title}</h5>
 
-                  <p className="text-muted mb-3">
-                    <strong>Category:</strong> {item.category}
-                  </p>
+        {fetching ? (
+          <div className="col-12 text-center py-4">
+            Loading materials...
+          </div>
+        ) : materials.length > 0 ? (
 
-                  <a
-                    href={getMediaUrl(item.filePath)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn-success btn-sm"
-                  >
-                    View Material
-                  </a>
+          materials.map((item) => {
+
+            const mediaUrl = getMediaUrl(item.filePath);
+
+            return (
+              <div
+                className="col-12 col-sm-6 col-lg-4"
+                key={item._id}
+              >
+                <div className="card shadow-sm h-100">
+
+                  <div className="card-body">
+
+                    <h5 className="card-title">
+                      {item.title}
+                    </h5>
+
+                    <p className="text-muted mb-3">
+                      <strong>Category:</strong>{" "}
+                      {item.category}
+                    </p>
+
+                    <a
+                      href={mediaUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-success btn-sm"
+                    >
+                      View Material
+                    </a>
+
+                  </div>
                 </div>
               </div>
-            </div>
-          ))
+            );
+          })
+
         ) : (
+
           <div className="col-12 text-center py-4">
             <h5>No materials uploaded yet</h5>
           </div>
+
         )}
+
       </div>
     </div>
   );
