@@ -1,60 +1,68 @@
-import { Link } from "react-router-dom";
+
+import { useEffect, useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import "./Sidebar.css";
 
 function Sidebar() {
+  const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const toggleMenu = () => {
+      setIsOpen((previous) => !previous);
+    };
+
+    window.addEventListener("toggle-crm-sidebar", toggleMenu);
+
+    return () => {
+      window.removeEventListener("toggle-crm-sidebar", toggleMenu);
+    };
+  }, []);
+
+  const closeMenu = () => setIsOpen(false);
+
+  const handleLogout = () => {
+    closeMenu();
+    navigate("/");
+  };
+
   return (
-    <div
-      style={{
-        width: "220px",
-        height: "100vh",
-        backgroundColor: "#1f2937",
-        color: "white",
-        padding: "20px"
-      }}
-    >
-      <h2>Menu</h2>
+    <>
+      {isOpen && (
+        <div
+          className="crm-sidebar-backdrop"
+          onClick={closeMenu}
+        />
+      )}
 
-      <hr />
+      <aside className={`crm-sidebar ${isOpen ? "open" : ""}`}>
+        <h2 className="crm-sidebar-title">Menu</h2>
 
-      <br />
+        <hr />
 
-      <Link
-        to="/dashboard"
-        style={{ color: "white", textDecoration: "none" }}
-      >
-        Dashboard
-      </Link>
+        <nav className="crm-sidebar-nav">
+          <NavLink to="/dashboard" onClick={closeMenu}>
+            Dashboard
+          </NavLink>
 
-      <br />
-      <br />
+          <NavLink to="/clients" onClick={closeMenu}>
+            Clients
+          </NavLink>
 
-      <Link
-        to="/clients"
-        style={{ color: "white", textDecoration: "none" }}
-      >
-        Clients
-      </Link>
+          <NavLink to="/add-client" onClick={closeMenu}>
+            Add Client
+          </NavLink>
 
-      <br />
-      <br />
-
-      <Link
-        to="/add-client"
-        style={{ color: "white", textDecoration: "none" }}
-      >
-        Add Client
-      </Link>
-
-      <br />
-      <br />
-
-      <Link
-        to="/"
-        style={{ color: "white", textDecoration: "none" }}
-      >
-        Logout
-      </Link>
-
-    </div>
+          <button
+            type="button"
+            className="crm-logout-button"
+            onClick={handleLogout}
+          >
+            Logout
+          </button>
+        </nav>
+      </aside>
+    </>
   );
 }
 
